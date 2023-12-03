@@ -1,7 +1,6 @@
 use frenderer::{Camera2D, Transform};
 pub use glam::*;
 
-
 #[derive(Clone, Copy)]
 pub struct Plant {
     pub pos: Vec2,
@@ -19,7 +18,6 @@ pub struct Zombie {
     pub vel: Vec2,
     pub health: usize,
 }
-
 
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, bytemuck::Zeroable, bytemuck::Pod, Debug)]

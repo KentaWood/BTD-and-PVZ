@@ -176,8 +176,8 @@ impl Engine {
     }
 }
 
-pub mod geom;
 pub mod collision;
+pub mod geom;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Spritesheet(usize);
