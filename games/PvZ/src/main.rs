@@ -256,7 +256,7 @@ impl engine::Game for Game {
                     center: plant.pos,
                     size: PLANT_SIZE_PEASHOOTER,
                 },
-                SPRITE_PLANT,
+                SPRITE_PLANT_PEASHOOTER,
             );
         }
             
