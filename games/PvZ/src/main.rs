@@ -1,5 +1,5 @@
 use engine_immediate as engine;
-use engine_immediate::{geom::*, Camera, Engine, SheetRegion};
+use engine_immediate::{geom::*, collision::*, Camera, Engine, SheetRegion};
 use rand::Rng;
 mod util;
 use util::screen_to_grid;
@@ -29,20 +29,6 @@ fn empty_Space(plants: &Vec<Plant>, x: f32, y: f32) -> bool {
 }
 
 
-struct Plant {
-    pos: Vec2,
-}
-
-struct Pea {
-    pos: Vec2,
-    vel: Vec2,
-}
-
-struct Zombie {
-    pos: Vec2,
-    vel: Vec2,
-}
-
 struct Game {
 
     score: u32,
@@ -70,13 +56,13 @@ impl engine::Game for Game {
         });
         
         #[cfg(not(target_arch = "wasm32"))]
-        let sprite_img = image::open("/Users/nobuko/Desktop/CS- 181G Projects/unit-3-Alex /Unit-3/assets/plantsZombies/167822.png").unwrap().into_rgba8();
+        let sprite_img = image::open("assets/plantsZombies/167822.png").unwrap().into_rgba8();
         let spritesheet = engine.add_spritesheet(sprite_img, Some("background spritesheet"));
 
-        let sprite_img2 = image::open("/Users/nobuko/Desktop/CS- 181G Projects/unit-3-Alex /Unit-3/assets/plantsZombies/icon.png").unwrap().into_rgba8();
+        let sprite_img2 = image::open("assets/plantsZombies/icon.png").unwrap().into_rgba8();
         let spritesheet2 = engine.add_spritesheet(sprite_img2, Some("character spritesheet"));
 
-        let sprite_img3 = image::open("/Users/nobuko/Desktop/CS- 181G Projects/Unit-3/assets/plantsZombies/PeashooterAssetsDS.webp").unwrap().into_rgba8();
+        let sprite_img3 = image::open("assets/plantsZombies/PeashooterAssetsDS.webp").unwrap().into_rgba8();
         let spritesheet3 = engine.add_spritesheet(sprite_img3, Some("character spritesheet"));
 
         let font = engine::BitFont::with_sheet_region(
@@ -109,39 +95,39 @@ impl engine::Game for Game {
     }
     fn update(&mut self, engine: &mut Engine) {
 
-        // if self.once {
-        //     // pea shooting of the plants 
-        //     self.plants.push(Plant {
-        //         pos: Vec2 {
-        //             x: 280.0,
-        //             y: 70.0,
-        //         },
-        //     });
+        if self.once {
+            // pea shooting of the plants 
+            self.plants.push(Plant {
+                pos: Vec2 {
+                    x: 280.0,
+                    y: 70.0,
+                },
+            });
         
-        //     self.peas.push(Pea {
-        //         pos: Vec2 {
-        //             x: 280.0,
-        //             y: 70.0,
-        //         },
-        //         vel: Vec2 {
-        //             x: 4.0,
-        //             y: 0.0,
-        //         },
-        //     });
+            self.peas.push(Pea {
+                pos: Vec2 {
+                    x: 280.0,
+                    y: 70.0,
+                },
+                vel: Vec2 {
+                    x: 4.0,
+                    y: 0.0,
+                },
+            });
         
-        //     self.plant_count = 1;
-        //     self.pea_count = 1;
+            self.plant_count = 1;
+            self.pea_count = 1;
         
-        //     for pea in self.peas.iter_mut() {
-        //         pea.pos.x += pea.vel.x;
-        //     }
+            for pea in self.peas.iter_mut() {
+                pea.pos.x += pea.vel.x;
+            }
         
-        //     self.once = false;
-        // }
+            //self.once = false;
+        }
 
-        // for pea in self.peas.iter_mut() {
-        //     pea.pos.x += pea.vel.x;
-        // }
+        for pea in self.peas.iter_mut() {
+            pea.pos.x += pea.vel.x;
+        }
         
         //moving of the zombies
 
@@ -156,6 +142,7 @@ impl engine::Game for Game {
                     x: -0.25,
                     y: 0.0,
                 },
+                health: 3,
             });
             
 
@@ -164,17 +151,24 @@ impl engine::Game for Game {
 
         }
 
+        let the_collisions = Collision::new(&self.zombies, &self.peas);
+        let vec_coll = the_collisions.check_collision();
+        if vec_coll.len() != 0 {
+            for (p, z) in vec_coll.iter() {
+                self.peas.remove(*p);
+                self.zombies[*z].health = self.zombies[*z].health - 1;
+                println!("{}", self.zombies[*z].health);
+                if self.zombies[*z].health == 0 {
+                    self.zombies.remove(*z);
+                }
+            }
+        }
+
         
         for zombie in self.zombies.iter_mut() {
             zombie.pos.x += zombie.vel.x;
         }
         
-        
-
-
-
-
-
 
         //Handles the placement of plants
         if self.mouse_clicked {
@@ -234,6 +228,7 @@ impl engine::Game for Game {
 
 
     }
+    
     fn render(&mut self, engine: &mut Engine) {
         //draw bg
         engine.draw_sprite(
@@ -248,19 +243,19 @@ impl engine::Game for Game {
             SheetRegion::new(0, 0, 0, 16, 1400, 600),
         );
 
-        // //draw Zombie 
-        // engine.draw_sprite(
-        //     self.spritesheet2,
-        //     AABB{
-        //         center: Vec2 {
-        //             x: 1100.0 ,
-        //             y: 90.0 ,
-        //         },
-        //         size: ZOMBIE_SIZE_NORMAL,
-        //     },
+        //draw Zombie 
+        engine.draw_sprite(
+            self.spritesheet2,
+            AABB{
+                center: Vec2 {
+                    x: 1100.0 ,
+                    y: 90.0 ,
+                },
+                size: ZOMBIE_SIZE_NORMAL,
+            },
             
-        //     SPRITE_ZOMBIE_NORMAL,
-        // );
+            SPRITE_ZOMBIE_NORMAL,
+        );
 
         engine.draw_sprite(
             self.spritesheet2,

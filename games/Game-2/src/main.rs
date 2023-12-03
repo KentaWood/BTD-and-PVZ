@@ -22,7 +22,7 @@ impl engine::Game for Game {
         });
         
         #[cfg(not(target_arch = "wasm32"))]
-        let sprite_img = image::open("/Users/nobuko/Desktop/CS- 181G Projects/unit-3-Alex /Unit-3/assets/title.jpg").unwrap().into_rgba8();
+        let sprite_img = image::open("assets/title.jpg").unwrap().into_rgba8();
         let spritesheet = engine.add_spritesheet(sprite_img, Some("demo spritesheet"));
 
         let font = engine::BitFont::with_sheet_region(
