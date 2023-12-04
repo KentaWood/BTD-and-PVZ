@@ -8,13 +8,13 @@ const W: f32 = 1400.0;
 const H: f32 = 600.0;
 
 const SPRITE_MONKEY_PEASHOOTER: SheetRegion = SheetRegion::new(0, 700, 0, 0, 230, 230);
-const MONKEY_SIZE_PEASHOOTER: Vec2 = Vec2 { x: 128.0, y: 128.0 };
+const MONKEY_SIZE_PEASHOOTER: Vec2 = Vec2 { x: 90.0, y: 90.0 };
 
 const SPRITE_BALLOON_NORMAL: SheetRegion = SheetRegion::new(0, 0, 0, 0, 23, 29);
 const BALLOON_SIZE_NORMAL: Vec2 = Vec2 { x: 44.0, y: 44.0 };
 
-const SPRITE_DART: SheetRegion = SheetRegion::new(0, 415, 40, 0, 100, 150);
-const DART_SIZE: Vec2 = Vec2 { x: 24.0, y: 32.0 };
+const SPRITE_DART: SheetRegion = SheetRegion::new(0, 415, 40, 0, 90, 110);
+const DART_SIZE: Vec2 = Vec2 { x: 20.0, y: 30.0 };
 
 fn empty_space(monkeys: &Vec<Monkey>, x: f32, y: f32) -> bool {
     for monkey in monkeys {
@@ -97,38 +97,8 @@ impl engine::Game for Game {
             self.once = true;
             self.start = true;
         }
-        /*
-        if self.once {
-            // pea shooting of the plants
-            self.plants.push(Plant {
-                pos: Vec2 { x: 280.0, y: 70.0 },
-            });
-
-            self.peas.push(Pea {
-                pos: Vec2 { x: 280.0, y: 70.0 },
-                vel: Vec2 { x: 4.0, y: 0.0 },
-            });
-
-            self.plant_count = 1;
-            self.pea_count = 1;
-
-            for pea in self.peas.iter_mut() {
-                pea.pos.x += pea.vel.x;
-            }
-
-            //self.once = false;
-        }
-        */
-
-        /* 
-        if self.dart_count == 0 && self.monkey_count != 0 {
-            self.darts.push(Dart {
-                pos: Vec2 { x: 280.0, y: 70.0 },
-                vel: Vec2 { x: 4.0, y: 0.0 },
-            });
-            self.dart_count = 1;
-        }
-*/
+        
+/* 
         let mut dart_delete: Vec<usize> = Vec::with_capacity(16);
         for (dart_index, dart) in self.darts.iter_mut().enumerate() {
             dart.pos.x += dart.vel.x;
@@ -139,19 +109,22 @@ impl engine::Game for Game {
         for i in dart_delete.iter().rev() {
             self.darts.remove(*i);
             self.dart_count -= 1;
-        }
+        }*/
 
 
         if self.once {
-            self.balloons.push(Balloon {
-                pos: Vec2 { x: -10.0, y: 320.0 },
-                vel: Vec2 { x: 2.0, y: 0.0 },
-                health: 3,
-                segment: 0,
-            });
+            for i in 0..50 {
+                self.balloons.push(Balloon {
+                    pos: Vec2 { x: -10.0 - (i as f32 *100.0), y: 320.0 },
+                    vel: Vec2 { x: 2.0, y: 0.0 },
+                    health: 1,
+                    segment: 0,
+                });
+            }
+            
 
-            self.balloon_count = 3;
-
+            self.balloon_count = 50;
+            
             self.once = false;
         }
 
@@ -159,6 +132,8 @@ impl engine::Game for Game {
         let vec_coll_dart = the_collisions.check_collision_dart();
         if !vec_coll_dart.is_empty() {
             for (p, z) in vec_coll_dart.iter() {
+                let num_monkey = self.darts[*p].monkey_num;
+                self.monkeys[num_monkey].dart = false;
                 self.darts.remove(*p);
                 self.dart_count -= 1;
                 self.balloons[*z].health -= 1;
@@ -173,10 +148,39 @@ impl engine::Game for Game {
             balloon.balloon_change_velocity();
             balloon.pos.x += balloon.vel.x;
             balloon.pos.y += balloon.vel.y;
-            //if balloon.pos.x < 110.0 {
-             //   std::process::exit(0);
-            //}
+            if balloon.segment > 13 {
+              std::process::exit(0);
+            }
         }
+
+        for (monkey_index, monkey) in self.monkeys.iter_mut().enumerate() {
+            if monkey.dart == false {
+                self.darts.push(Dart {
+                    pos: Vec2 { x: monkey.pos.x, y: monkey.pos.y },
+                    vel: Vec2 { x: 0.0, y: -4.0 },
+                    monkey_num: monkey_index,
+                });
+                self.dart_count += 1;
+                monkey.dart = true;
+
+            }
+        }
+
+
+        let mut dart_delete: Vec<usize> = Vec::with_capacity(16);
+        for (dart_index, dart) in self.darts.iter_mut().enumerate() {
+            dart.pos.y += dart.vel.y;
+            if dart.pos.y < 0.0 {
+                dart_delete.push(dart_index);
+            }
+        }
+        for i in dart_delete.iter().rev() {
+            let num_monkey = self.darts[*i].monkey_num;
+            self.monkeys[num_monkey].dart = false;
+            self.darts.remove(*i);
+            self.dart_count -= 1;
+        }
+
 
         //Handles the placement of plants
         if self.mouse_clicked {
@@ -215,6 +219,7 @@ impl engine::Game for Game {
                     x: mouse_x,
                     y: mouse_y,
                 },
+                dart: false
             });
             self.monkey_count += 1;
         }
@@ -258,7 +263,7 @@ impl engine::Game for Game {
 
         for dart in self.darts.iter() {
             engine.draw_sprite(
-                self.spritesheet2,
+                self.spritesheet3,
                 AABB {
                     center: dart.pos,
                     size: DART_SIZE,

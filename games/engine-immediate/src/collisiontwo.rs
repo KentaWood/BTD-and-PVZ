@@ -24,8 +24,8 @@ impl Collisiontwo {
         let mut monk = 0;
         for dart in self.darts.iter() {
             for balloon in self.balloons.iter() {
-                if dart.pos.x + 24.0 > balloon.pos.x {
-                    if dart.pos.y < balloon.pos.y + 128.0 && dart.pos.y + 32.0 > balloon.pos.y {
+                if dart.pos.x + 20.0 > balloon.pos.x && dart.pos.x < balloon.pos.x + 44.0 {
+                    if dart.pos.y < balloon.pos.y + 44.0 && dart.pos.y + 30.0 > balloon.pos.y {
                         let tup = (dart_c, monk);
                         collisions.push(tup);
                     }
