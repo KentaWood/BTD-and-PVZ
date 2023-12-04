@@ -176,6 +176,7 @@ impl Engine {
     }
 }
 
+pub mod collision;
 pub mod geom;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]

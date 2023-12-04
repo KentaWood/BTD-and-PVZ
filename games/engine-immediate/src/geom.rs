@@ -1,5 +1,26 @@
 use frenderer::{Camera2D, Transform};
+use std::{ borrow::Cow, mem, time::{Duration, Instant}, };
 pub use glam::*;
+
+#[derive(Clone, Copy)]
+pub struct Plant {
+    pub pos: Vec2,
+    pub action_time: Instant,
+    pub placed: bool,
+}
+
+#[derive(Clone, Copy)]
+pub struct Pea {
+    pub pos: Vec2,
+    pub vel: Vec2,
+}
+
+#[derive(Clone, Copy)]
+pub struct Zombie {
+    pub pos: Vec2,
+    pub vel: Vec2,
+    pub health: usize,
+}
 
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, bytemuck::Zeroable, bytemuck::Pod, Debug)]
