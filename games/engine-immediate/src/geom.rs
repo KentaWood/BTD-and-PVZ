@@ -19,6 +19,27 @@ pub struct Zombie {
     pub health: usize,
 }
 
+
+
+#[derive(Clone, Copy)]
+pub struct Monkey {
+    pub pos: Vec2,
+}
+
+#[derive(Clone, Copy)]
+pub struct Dart {
+    pub pos: Vec2,
+    pub vel: Vec2,
+}
+
+#[derive(Clone, Copy)]
+pub struct Balloon {
+    pub pos: Vec2,
+    pub vel: Vec2,
+    pub health: usize,
+}
+
+
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, bytemuck::Zeroable, bytemuck::Pod, Debug)]
 pub struct Rect {
