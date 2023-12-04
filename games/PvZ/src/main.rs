@@ -1,7 +1,9 @@
 use engine_immediate as engine;
 use engine_immediate::{collision::*, geom::*, Camera, Engine, SheetRegion};
+
 use std::{ borrow::Cow, mem, time::{Duration, Instant}, };
 use rand::Rng;
+
 mod util;
 use util::convert_mouse_pos;
 use util::screen_to_grid;
@@ -28,7 +30,9 @@ fn empty_space(plants: &Vec<Plant>, x: f32, y: f32) -> bool {
 }
 
 struct Game {
+
     sunflower: u32,
+
     font: engine::BitFont,
     spritesheet: engine::Spritesheet,
     spritesheet2: engine::Spritesheet,
@@ -41,11 +45,14 @@ struct Game {
     zombie_count: usize,
     plant_count: usize,
     pea_count: usize,
+
     mode: u32, // 0 = Starting Screen, 1 = PvZ, 2 = Game Over
+
     mouse_clicked: bool,
     plant_index: usize,
     once: bool,
     start: bool,
+
     game_time: Instant,
     sunflower_time: Instant,
     spawn_timer: Instant,
@@ -60,27 +67,32 @@ impl engine::Game for Game {
         });
 
         #[cfg(not(target_arch = "wasm32"))]
-        let sprite_img = image::open("/Users/nobuko/Desktop/CS- 181G Projects/Unit-3/assets/plantsZombies/167822.png")
+
+        let sprite_img = image::open("assets/plantsZombies/167822.png")
+
             .unwrap()
             .into_rgba8();
         let spritesheet = engine.add_spritesheet(sprite_img, Some("background spritesheet"));
 
-        let sprite_img2 = image::open("/Users/nobuko/Desktop/CS- 181G Projects/Unit-3/assets/plantsZombies/icon.png")
+
+        let sprite_img2 = image::open("assets/plantsZombies/icon.png")
+
             .unwrap()
             .into_rgba8();
         let spritesheet2 = engine.add_spritesheet(sprite_img2, Some("character spritesheet"));
 
-        let sprite_img3 = image::open("/Users/nobuko/Desktop/CS- 181G Projects/Unit-3/assets/plantsZombies/PeashooterAssetsDS.webp")
+
+        let sprite_img3 = image::open("assets/plantsZombies/PeashooterAssetsDS.webp")
             .unwrap()
             .into_rgba8();
         let spritesheet3 = engine.add_spritesheet(sprite_img3, Some("pea spritesheet"));
 
-        let sprite_img4 = image::open("/Users/nobuko/Desktop/CS- 181G Projects/Unit-3/assets/demo.png")
+        let sprite_img4 = image::open("assets/demo.png")
             .unwrap()
             .into_rgba8();
         let spritesheet4 = engine.add_spritesheet(sprite_img4, Some("score spritesheet"));
 
-        let sprite_img5 = image::open("/Users/nobuko/Desktop/CS- 181G Projects/Unit-3/assets/plantsZombies/PvZ1ZombiesWon.webp")
+        let sprite_img5 = image::open("assets/plantsZombies/PvZ1ZombiesWon.webp")
             .unwrap()
             .into_rgba8();
         let spritesheet5 = engine.add_spritesheet(sprite_img5, Some("score spritesheet"));
@@ -110,13 +122,26 @@ impl engine::Game for Game {
             pea_count: 0,
             once: false,
             start: false,
+
             game_time: Instant::now(),
             sunflower_time: Instant::now(),
             spawn_timer: Instant::now(),
             spawn_in: Duration::from_secs(1),
+
         }
     }
     fn update(&mut self, engine: &mut Engine) {
+        if self.mouse_clicked && !self.start {
+            self.once = true;
+            self.start = true;
+        }
+        /*
+        if self.once {
+            // pea shooting of the plants
+            self.plants.push(Plant {
+                pos: Vec2 { x: 280.0, y: 70.0 },
+            });
+
 
         if self.mouse_clicked && !self.start {
             self.once = true;
@@ -197,6 +222,7 @@ impl engine::Game for Game {
             self.zombies.push(Zombie {
                 pos: Vec2 { x: 1100.0, y: 90.0 },
                 vel: Vec2 { x: -3.0, y: 0.0 },
+
                 health: 3,
             });
 
@@ -204,6 +230,7 @@ impl engine::Game for Game {
 
             self.once = false;
         }
+
 
         //handles when the pea hits a zombie
         let the_collisions = Collision::new(&self.zombies, &self.peas, &self.plants);
@@ -228,12 +255,14 @@ impl engine::Game for Game {
             }
         }
 
+
         //game over when a zombie touches the end
         for zombie in self.zombies.iter_mut() {
             zombie.pos.x += zombie.vel.x;
             if zombie.pos.x < 220.0 {
                 self.mode = 2;
                 println!("game over");
+
             }
         }
 
@@ -243,7 +272,7 @@ impl engine::Game for Game {
                     let mouse_pos = engine.input.mouse_pos();
                     let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
 
-                    
+    
                     
                     self.plants[self.plant_index].pos.x = mouse_x;
                     self.plants[self.plant_index].pos.y = mouse_y;
@@ -276,10 +305,9 @@ impl engine::Game for Game {
                         self.plants.pop();
                     }
 
-
-
                     
                 }
+
         } else if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
             let mouse_pos = engine.input.mouse_pos();
             let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
@@ -290,6 +318,7 @@ impl engine::Game for Game {
                     x: mouse_x,
                     y: mouse_y,
                 },
+
                 action_time: Instant::now(),
                 placed: false,
             });
@@ -303,6 +332,7 @@ impl engine::Game for Game {
         //start (Maybe)
 
         if self.mode == 0{
+
 
         }
 
@@ -321,6 +351,7 @@ impl engine::Game for Game {
                 },
                 SheetRegion::new(0, 0, 0, 16, 1400, 600),
             );
+
 
             //draw all the plants
             for plant in self.plants.iter() {
@@ -368,6 +399,7 @@ impl engine::Game for Game {
                     y: 550.0,
                 },
                 48.0,
+
             );
 
             //game over screen
@@ -391,10 +423,7 @@ impl engine::Game for Game {
 
 
         }
-        
 
-        
-        
     }
 }
 fn main() {

@@ -45,7 +45,9 @@ impl Collision {
         for plant in self.plants.iter() {
             for zombie in self.zombies.iter() {
                 if plant.pos.x + 64.0 > zombie.pos.x {
+
                     if plant.pos.y < zombie.pos.y + 128.0 && plant.pos.y + 64.0 > zombie.pos.y && plant.placed == true {
+
                         let tup = (plan, zomb);
                         collisions.push(tup);
                     }
@@ -57,4 +59,6 @@ impl Collision {
         }
         return collisions;
     }
+
 }
+
