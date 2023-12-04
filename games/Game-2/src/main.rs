@@ -5,13 +5,11 @@ use rand::Rng;
 const W: f32 = 1400.0;
 const H: f32 = 600.0;
 
-
 struct Game {
-
     score: u32,
     font: engine::BitFont,
     spritesheet: engine::Spritesheet,
-    mode: u32, // 0 = PvZ, 1 = Game Won, 2 = Game Over 
+    mode: u32, // 0 = PvZ, 1 = Game Won, 2 = Game Over
 }
 
 impl engine::Game for Game {
@@ -20,9 +18,9 @@ impl engine::Game for Game {
             screen_pos: [0.0, 0.0],
             screen_size: [W, H],
         });
-        
+
         #[cfg(not(target_arch = "wasm32"))]
-        let sprite_img = image::open("/Users/nobuko/Desktop/CS- 181G Projects/unit-3-Alex /Unit-3/assets/title.jpg").unwrap().into_rgba8();
+        let sprite_img = image::open("assets/title.jpg").unwrap().into_rgba8();
         let spritesheet = engine.add_spritesheet(sprite_img, Some("demo spritesheet"));
 
         let font = engine::BitFont::with_sheet_region(
@@ -38,10 +36,7 @@ impl engine::Game for Game {
         }
     }
     fn update(&mut self, engine: &mut Engine) {
-
-        
         if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
-
             let mouse_pos = engine.input.mouse_pos();
             println!("{:?}", mouse_pos);
         }
@@ -52,8 +47,8 @@ impl engine::Game for Game {
             self.spritesheet,
             AABB {
                 center: Vec2 {
-                    x: W / 2.0 ,
-                    y: H / 2.0 ,
+                    x: W / 2.0,
+                    y: H / 2.0,
                 },
                 size: Vec2 { x: W, y: H },
             },
