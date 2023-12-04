@@ -120,15 +120,15 @@ impl engine::Game for Game {
         }
         */
 
-        
-                if self.pea_count == 0 && self.plant_count != 0 {
-                    self.peas.push(Pea {
-                        pos: Vec2 { x: 280.0, y: 70.0 },
-                        vel: Vec2 { x: 4.0, y: 0.0 },
-                    });
-                    self.pea_count = 1;
-                }
-        
+        /*
+        if self.pea_count == 0 && self.plant_count != 0 {
+            self.peas.push(Pea {
+                pos: Vec2 { x: 280.0, y: 70.0 },
+                vel: Vec2 { x: 4.0, y: 0.0 },
+            });
+            self.pea_count = 1;
+        }*/
+
         let mut pea_delete: Vec<usize> = Vec::with_capacity(16);
         for (pea_index, pea) in self.peas.iter_mut().enumerate() {
             pea.pos.x += pea.vel.x;
@@ -146,7 +146,7 @@ impl engine::Game for Game {
         if self.once {
             self.zombies.push(Zombie {
                 pos: Vec2 { x: 1100.0, y: 90.0 },
-                vel: Vec2 { x: -1.25, y: 0.0 },
+                vel: Vec2 { x: -0.25, y: 0.0 },
                 health: 3,
             });
 
@@ -179,6 +179,9 @@ impl engine::Game for Game {
 
         for zombie in self.zombies.iter_mut() {
             zombie.pos.x += zombie.vel.x;
+            if zombie.pos.x < 110.0 {
+                std::process::exit(0);
+            }
         }
 
         //Handles the placement of plants
