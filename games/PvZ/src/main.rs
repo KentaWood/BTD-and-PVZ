@@ -120,14 +120,14 @@ impl engine::Game for Game {
         }
         */
 
-        /*
+        
         if self.pea_count == 0 && self.plant_count != 0 {
             self.peas.push(Pea {
                 pos: Vec2 { x: 280.0, y: 70.0 },
                 vel: Vec2 { x: 4.0, y: 0.0 },
             });
             self.pea_count = 1;
-        }*/
+        }
 
         let mut pea_delete: Vec<usize> = Vec::with_capacity(16);
         for (pea_index, pea) in self.peas.iter_mut().enumerate() {
