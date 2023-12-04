@@ -19,6 +19,80 @@ pub struct Zombie {
     pub health: usize,
 }
 
+
+
+#[derive(Clone, Copy)]
+pub struct Monkey {
+    pub pos: Vec2,
+    pub dart: bool,
+}
+
+#[derive(Clone, Copy)]
+pub struct Dart {
+    pub pos: Vec2,
+    pub vel: Vec2,
+    pub monkey_num: usize,
+}
+
+#[derive(Clone, Copy)]
+pub struct Balloon {
+    pub pos: Vec2,
+    pub vel: Vec2,
+    pub health: usize,
+    pub segment: usize,
+}
+
+impl Balloon {
+    pub fn balloon_change_velocity(&mut self) {
+        if self.segment == 0 && self.pos.x >= 280.0 {
+            self.vel = Vec2 { x: 0.0, y: 1.5 };
+            self.segment = 1;
+        } else if self.segment == 1 && self.pos.y >= 475.0 {
+            self.vel = Vec2 { x: 1.5, y: 0.0 };
+            self.segment = 2;
+        } else if self.segment == 2 && self.pos.x >= 600.0 {
+            self.vel = Vec2 { x: 0.0, y: -1.0 };
+            self.segment = 3;
+        } else if self.segment == 3 && self.pos.y <= 175.0 {
+            self.vel = Vec2 { x: -1.5, y: 0.0 };
+            self.segment = 4;
+        } else if self.segment == 4 && self.pos.x <= 150.0 {
+            self.vel = Vec2 { x: 0.0, y: -1.0 };
+            self.segment = 5;
+        } else if self.segment == 5 && self.pos.y <= 80.0 {
+            self.vel = Vec2 { x: 1.5, y: 0.0 };
+            self.segment = 6;
+        } else if self.segment == 6 && self.pos.x >= 1200.0 {
+            self.vel = Vec2 { x: 0.0, y: 1.0 };
+            self.segment = 7;
+        } else if self.segment == 7 && self.pos.y >= 240.0 {
+            self.vel = Vec2 { x: -1.5, y: 0.0 };
+            self.segment = 8;
+        } else if self.segment == 8 && self.pos.x <= 890.0 {
+            self.vel = Vec2 { x: 0.0, y: 1.0 };
+            self.segment = 9;
+        } else if self.segment == 9 && self.pos.y >= 370.0 {
+            self.vel = Vec2 { x: 1.5, y: 0.0 };
+            self.segment = 10;
+        } else if self.segment == 10 && self.pos.x >= 1200.0 {
+            self.vel = Vec2 { x: 0.0, y: 1.0 };
+            self.segment = 11;
+        } else if self.segment == 11 && self.pos.y >= 540.0 {
+            self.vel = Vec2 { x: -1.5, y: 0.0 };
+            self.segment = 12;
+        } else if self.segment == 12 && self.pos.x <= 770.0 {
+            self.vel = Vec2 { x: 0.0, y: 1.0 };
+            self.segment = 13;
+        } else if self.segment == 13 && self.pos.y >= 610.0 {
+            self.segment = 14;
+        } 
+    } 
+}
+
+    
+        // 770, 540
+        // 770, 610
+
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, bytemuck::Zeroable, bytemuck::Pod, Debug)]
 pub struct Rect {
