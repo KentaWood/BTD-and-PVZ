@@ -81,7 +81,7 @@ impl engine::Game for Game {
             font,
             mode: 0,
             monkeys: Vec::with_capacity(16),
-            balloons: Vec::with_capacity(16),
+            balloons: Vec::with_capacity(48),
             darts: Vec::with_capacity(16),
             mouse_clicked: false,
             balloon_count: 0,
@@ -120,7 +120,7 @@ impl engine::Game for Game {
         }
         */
 
-        
+        /* 
         if self.dart_count == 0 && self.monkey_count != 0 {
             self.darts.push(Dart {
                 pos: Vec2 { x: 280.0, y: 70.0 },
@@ -128,7 +128,7 @@ impl engine::Game for Game {
             });
             self.dart_count = 1;
         }
-
+*/
         let mut dart_delete: Vec<usize> = Vec::with_capacity(16);
         for (dart_index, dart) in self.darts.iter_mut().enumerate() {
             dart.pos.x += dart.vel.x;
@@ -141,16 +141,16 @@ impl engine::Game for Game {
             self.dart_count -= 1;
         }
 
-        //moving of the zombies
 
         if self.once {
             self.balloons.push(Balloon {
-                pos: Vec2 { x: 1100.0, y: 90.0 },
-                vel: Vec2 { x: -0.25, y: 0.0 },
+                pos: Vec2 { x: -10.0, y: 320.0 },
+                vel: Vec2 { x: 2.0, y: 0.0 },
                 health: 3,
+                segment: 0,
             });
 
-            self.balloon_count = 1;
+            self.balloon_count = 3;
 
             self.once = false;
         }
@@ -170,10 +170,12 @@ impl engine::Game for Game {
         }
 
         for balloon in self.balloons.iter_mut() {
+            balloon.balloon_change_velocity();
             balloon.pos.x += balloon.vel.x;
-            if balloon.pos.x < 110.0 {
-                std::process::exit(0);
-            }
+            balloon.pos.y += balloon.vel.y;
+            //if balloon.pos.x < 110.0 {
+             //   std::process::exit(0);
+            //}
         }
 
         //Handles the placement of plants
