@@ -152,34 +152,33 @@ impl engine::Game for Game {
 
         //random spawning of the regualr zombies 
         if self.spawn_timer.elapsed() > self.spawn_in{
-
+            let tempo = select_tempo(self.game_time.elapsed()) as usize;
             
+            for _ in 0 .. tempo + 1{
 
-            let random_index = rand::thread_rng().gen_range(0..ZOMBIR_Y_SPAWNS.len());
-            let speed = ZOMBIE_SPEED[select_tempo(self.game_time.elapsed()) as usize];
+                let random_index = rand::thread_rng().gen_range(0..ZOMBIR_Y_SPAWNS.len());
+                let speed = ZOMBIE_SPEED[select_tempo(self.game_time.elapsed()) as usize];
+    
+                self.zombies.push(Zombie {
+                    pos: Vec2 { x: 1100.0, y:  ZOMBIR_Y_SPAWNS[random_index] as f32},
+                    vel: Vec2 { x: speed as f32, y: 0.0 },
+                    health: 3,
+                });
+                
+                self.zombie_count +=1;
 
-            self.zombies.push(Zombie {
-                pos: Vec2 { x: 1100.0, y:  ZOMBIR_Y_SPAWNS[random_index] as f32},
-                vel: Vec2 { x: speed as f32, y: 0.0 },
-                health: 3,
-            });
+            }
 
-            
             let mut rng = rand::thread_rng();
-
-
-
             let fast = SPAWN_TEMPO[select_tempo(self.game_time.elapsed()) as usize].0;
             let slow = SPAWN_TEMPO[select_tempo(self.game_time.elapsed()) as usize].1;
 
-            
-            let random_number: u32 = rng.gen_range(fast..=slow);
-            
-
+            let random_number: u32 = rng.gen_range(fast..= slow);
             self.spawn_in = Duration::from_secs(random_number.into());
             self.spawn_timer = Instant::now();
+            
 
-            self.zombie_count +=1;
+
         }
         
         
@@ -230,7 +229,7 @@ impl engine::Game for Game {
         let vec_coll_pea = the_collisions.check_collision_pea();
         let vec_coll_plant = the_collisions.check_collision_plant();
         if !vec_coll_pea.is_empty() {
-            for (p, z) in vec_coll_pea.iter() {
+            for (p, z) in vec_coll_pea.iter().rev() {
                 self.peas.remove(*p);
                 self.pea_count -= 1;
                 self.zombies[*z].health -= 1;
@@ -245,6 +244,7 @@ impl engine::Game for Game {
             for (p, _z) in vec_coll_plant.iter() {
                 self.plants.remove(*p);
                 self.plant_count -= 1;
+                self.plant_index -= 1;
             }
         }
 
@@ -289,6 +289,7 @@ impl engine::Game for Game {
 
                         } else {
                             self.mouse_clicked = false;
+                            self.plant_index -= 1;
                             self.plants.pop();
                         }
                     }
