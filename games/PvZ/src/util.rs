@@ -1,3 +1,7 @@
+
+
+use std::time::{Duration, Instant};
+
 pub fn screen_to_grid(x: f32, y: f32) -> (f32, f32) {
     let mut grid_x = 700.0; // Default values
     let mut grid_y = 300.0;
@@ -64,4 +68,14 @@ pub fn convert_mouse_pos(mouse_pos: (i32, i32)) -> (f32, f32) {
     let mouse_x = mouse_pos.0 as f32 / 1.142_857_2;
     let mouse_y = (1200.0 - mouse_pos.1 as f32) / 2.0;
     (mouse_x, mouse_y)
+}
+
+pub fn select_tempo(elapsed_time: Duration) -> u64 {
+    let mut index = elapsed_time.as_secs() / 30;
+
+    if index > 4 {
+        index = 4;
+    }
+    
+    index
 }

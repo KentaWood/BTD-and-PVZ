@@ -42,6 +42,7 @@ struct Game {
     mouse_clicked: bool,
     once: bool,
     start: bool,
+    oneplacement: bool,
 }
 
 impl engine::Game for Game {
@@ -90,6 +91,7 @@ impl engine::Game for Game {
             monkey_index: 0,
             once: false,
             start: false,
+            oneplacement: true,
         }
     }
     fn update(&mut self, engine: &mut Engine) {
@@ -181,48 +183,52 @@ impl engine::Game for Game {
             self.dart_count -= 1;
         }
 
-
-        //Handles the placement of plants
-        if self.mouse_clicked {
-            if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
-                let mouse_pos = engine.input.mouse_pos();
-                let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
-
-                // println!("{:?}", mouse_pos);
-                println!("{}, {}", mouse_x, mouse_y);
-                self.monkeys[self.monkey_index].pos.x = mouse_x;
-                self.monkeys[self.monkey_index].pos.y = mouse_y;
-            } else {
-                let mouse_pos = engine.input.mouse_pos();
-                let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
-                let (grid_x, grid_y) = screen_to_grid(mouse_x, mouse_y);
-
-                if empty_space(&self.monkeys, grid_x, grid_y) {
-                    self.monkeys[self.monkey_index].pos.x = grid_x;
-                    self.monkeys[self.monkey_index].pos.y = grid_y;
-
-                    self.mouse_clicked = false;
-
-                    self.monkey_index += 1;
+        if self.oneplacement{
+            if self.mouse_clicked {
+                if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
+                    let mouse_pos = engine.input.mouse_pos();
+                    let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
+    
+                    // println!("{:?}", mouse_pos);
+                    println!("{}, {}", mouse_x, mouse_y);
+                    self.monkeys[self.monkey_index].pos.x = mouse_x;
+                    self.monkeys[self.monkey_index].pos.y = mouse_y;
                 } else {
-                    self.mouse_clicked = false;
-                    self.monkeys.pop();
+                    let mouse_pos = engine.input.mouse_pos();
+                    let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
+                    let (grid_x, grid_y) = screen_to_grid(mouse_x, mouse_y);
+    
+                    if empty_space(&self.monkeys, grid_x, grid_y) {
+                        self.monkeys[self.monkey_index].pos.x = mouse_x;
+                        self.monkeys[self.monkey_index].pos.y = mouse_y;
+    
+                        self.mouse_clicked = false;
+    
+                        self.monkey_index += 1;
+                        self.oneplacement = false;
+                    } else {
+                        self.mouse_clicked = false;
+                        self.monkeys.pop();
+                    }
                 }
+            } else if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
+                let mouse_pos = engine.input.mouse_pos();
+                let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
+    
+                self.mouse_clicked = true;
+                self.monkeys.push(Monkey {
+                    pos: Vec2 {
+                        x: mouse_x,
+                        y: mouse_y,
+                    },
+                    dart: false
+                });
+                self.monkey_count += 1;
             }
-        } else if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
-            let mouse_pos = engine.input.mouse_pos();
-            let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
 
-            self.mouse_clicked = true;
-            self.monkeys.push(Monkey {
-                pos: Vec2 {
-                    x: mouse_x,
-                    y: mouse_y,
-                },
-                dart: false
-            });
-            self.monkey_count += 1;
         }
+        //Handles the placement of plants
+       
     }
 
     fn render(&mut self, engine: &mut Engine) {

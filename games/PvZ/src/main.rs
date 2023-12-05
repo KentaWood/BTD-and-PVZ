@@ -7,6 +7,7 @@ use rand::Rng;
 mod util;
 use util::convert_mouse_pos;
 use util::screen_to_grid;
+use util::select_tempo;
 
 const W: f32 = 1400.0;
 const H: f32 = 600.0;
@@ -14,11 +15,17 @@ const H: f32 = 600.0;
 const SPRITE_PLANT_PEASHOOTER: SheetRegion = SheetRegion::new(0, 448, 128, 0, 64, 64);
 const PLANT_SIZE_PEASHOOTER: Vec2 = Vec2 { x: 64.0, y: 64.0 };
 
-const SPRITE_ZOMBIE_NORMAL: SheetRegion = SheetRegion::new(0, 0, 0, 0, 64, 128);
+const SPRITE_ZOMBIE_NORMAL: SheetRegion = SheetRegion::new(0, 0, 28, 0, 64, 100);
 const ZOMBIE_SIZE_NORMAL: Vec2 = Vec2 { x: 64.0, y: 128.0 };
 
 const SPRITE_PEA: SheetRegion = SheetRegion::new(0, 66, 36, 0, 10, 16);
 const PEA_SIZE: Vec2 = Vec2 { x: 24.0, y: 32.0 };
+
+const ZOMBIR_Y_SPAWNS: &[f64] = &[90.0, 195.0, 285.0, 390.0, 490.0];
+
+const SPAWN_TEMPO: [(u32, u32); 5] = [ (3, 7), (2, 6), (1, 4), (1, 3), (1, 2),];
+const ZOMBIE_SPEED: &[f64] = &[-0.5, -0.75, -1.0, -1.5, -2.25];
+
 
 fn empty_space(plants: &Vec<Plant>, x: f32, y: f32) -> bool {
     for plant in plants {
@@ -126,7 +133,7 @@ impl engine::Game for Game {
             game_time: Instant::now(),
             sunflower_time: Instant::now(),
             spawn_timer: Instant::now(),
-            spawn_in: Duration::from_secs(1),
+            spawn_in: Duration::from_secs(3),
 
         }
     }
@@ -135,13 +142,8 @@ impl engine::Game for Game {
             self.once = true;
             self.start = true;
         }
-        /*
-        if self.once {
-            // pea shooting of the plants
-            self.plants.push(Plant {
-                pos: Vec2 { x: 280.0, y: 70.0 },
-            });
-
+        
+        
 
         if self.mouse_clicked && !self.start {
             self.once = true;
@@ -149,33 +151,36 @@ impl engine::Game for Game {
         }
 
         //random spawning of the regualr zombies 
-        // if self.spawn_timer.elapsed() > self.spawn_in{
+        if self.spawn_timer.elapsed() > self.spawn_in{
 
-        //     self.zombies.push(Zombie {
-        //         pos: Vec2 { x: 1100.0, y: 90.0 },
-        //         vel: Vec2 { x: -1.0, y: 0.0 },
-        //         health: 3,
-        //     });
+            
 
-        //     self.zombies.push(Zombie {
-        //         pos: Vec2 { x: 1100.0, y: 175.0 },
-        //         vel: Vec2 { x: -1.0, y: 0.0 },
-        //         health: 3,
-        //     });
+            let random_index = rand::thread_rng().gen_range(0..ZOMBIR_Y_SPAWNS.len());
+            let speed = ZOMBIE_SPEED[select_tempo(self.game_time.elapsed()) as usize];
 
-        //     self.zombies.push(Zombie {
-        //         pos: Vec2 { x: 1100.0, y: 250.0 },
-        //         vel: Vec2 { x: -1.0, y: 0.0 },
-        //         health: 3,
-        //     });
+            self.zombies.push(Zombie {
+                pos: Vec2 { x: 1100.0, y:  ZOMBIR_Y_SPAWNS[random_index] as f32},
+                vel: Vec2 { x: speed as f32, y: 0.0 },
+                health: 3,
+            });
 
-        //     let mut rng = rand::thread_rng();
-        //     let random_number: u32 = rng.gen_range(1..=3);
-        //     println!("{}", random_number);
+            
+            let mut rng = rand::thread_rng();
 
-        //     self.spawn_in = Duration::from_secs(random_number.into());
-        //     self.spawn_timer = Instant::now();
-        // }
+
+
+            let fast = SPAWN_TEMPO[select_tempo(self.game_time.elapsed()) as usize].0;
+            let slow = SPAWN_TEMPO[select_tempo(self.game_time.elapsed()) as usize].1;
+
+            
+            let random_number: u32 = rng.gen_range(fast..=slow);
+            
+
+            self.spawn_in = Duration::from_secs(random_number.into());
+            self.spawn_timer = Instant::now();
+
+            self.zombie_count +=1;
+        }
         
         
 
@@ -217,19 +222,7 @@ impl engine::Game for Game {
             self.pea_count -= 1;
         }
 
-        //moving of the zombies
-        if self.once {
-            self.zombies.push(Zombie {
-                pos: Vec2 { x: 1100.0, y: 90.0 },
-                vel: Vec2 { x: -3.0, y: 0.0 },
-
-                health: 3,
-            });
-
-            self.zombie_count = 1;
-
-            self.once = false;
-        }
+        
 
 
         //handles when the pea hits a zombie

@@ -3,6 +3,26 @@
 version = 3
 
 [[package]]
+name = "BTD"
+version = "0.1.0"
+dependencies = [
+ "engine-immediate",
+ "image",
+ "rand",
+ "winit",
+]
+
+[[package]]
+name = "PvZ"
+version = "0.1.0"
+dependencies = [
+ "engine-immediate",
+ "image",
+ "rand",
+ "winit",
+]
+
+[[package]]
 name = "ab_glyph"
 version = "0.2.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -459,26 +479,6 @@ dependencies = [
  "glam",
  "image",
  "serde",
- "winit",
-]
-
-[[package]]
-name = "engine-immediate-game"
-version = "0.1.0"
-dependencies = [
- "engine-immediate",
- "image",
- "rand",
- "winit",
-]
-
-[[package]]
-name = "engine-immediate-game2"
-version = "0.1.0"
-dependencies = [
- "engine-immediate",
- "image",
- "rand",
  "winit",
 ]
 

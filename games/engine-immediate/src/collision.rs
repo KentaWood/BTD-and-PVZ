@@ -25,7 +25,7 @@ impl Collision {
         for pea in self.peas.iter() {
             for zombie in self.zombies.iter() {
                 if pea.pos.x + 24.0 > zombie.pos.x {
-                    if pea.pos.y < zombie.pos.y + 128.0 && pea.pos.y + 32.0 > zombie.pos.y {
+                    if pea.pos.y < zombie.pos.y + 64.0 && pea.pos.y + 32.0 > zombie.pos.y {
                         let tup = (pea_c, zomb);
                         collisions.push(tup);
                     }
@@ -46,7 +46,7 @@ impl Collision {
             for zombie in self.zombies.iter() {
                 if plant.pos.x + 64.0 > zombie.pos.x {
 
-                    if plant.pos.y < zombie.pos.y + 128.0 && plant.pos.y + 64.0 > zombie.pos.y && plant.placed == true {
+                    if plant.pos.y < zombie.pos.y + 64.0 && plant.pos.y + 64.0 > zombie.pos.y && plant.placed == true {
 
                         let tup = (plan, zomb);
                         collisions.push(tup);
