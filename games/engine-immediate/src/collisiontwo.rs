@@ -47,7 +47,7 @@ impl Collisiontwo {
 
     pub fn circle_monkey(&self, x: f32, y: f32) -> usize {
         for (circle_index, circle) in self.circles.iter().enumerate() {
-            if !circle.filled {
+            
                 if x > circle.pos.x - 80.0
                     && x < circle.pos.x + 80.0
                     && y > circle.pos.y - 50.0
@@ -55,7 +55,7 @@ impl Collisiontwo {
                 {
                     return circle_index;
                 }
-            }
+
         }
         return 10;
     }

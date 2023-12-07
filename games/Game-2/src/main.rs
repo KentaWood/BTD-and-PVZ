@@ -9,7 +9,10 @@ use util::screen_to_grid;
 const W: f32 = 1400.0;
 const H: f32 = 600.0;
 
-const SPRITE_MONKEY_PEASHOOTER: SheetRegion = SheetRegion::new(0, 700, 0, 0, 230, 230);
+const SPRITE_MONKEY_PEASHOOTER1: SheetRegion = SheetRegion::new(0, 700, 0, 0, 230, 240);
+const SPRITE_MONKEY_PEASHOOTER2: SheetRegion = SheetRegion::new(0, 700, 230, 0, 210, 230);
+const SPRITE_MONKEY_PEASHOOTER3: SheetRegion = SheetRegion::new(0, 700, 460, 0, 230, 230);
+const SPRITE_MONKEY_PEASHOOTER4: SheetRegion = SheetRegion::new(0, 700, 690, 0, 210, 240);
 const MONKEY_SIZE_PEASHOOTER: Vec2 = Vec2 { x: 90.0, y: 90.0 };
 
 const SPRITE_CIRCLE_PEASHOOTER: SheetRegion = SheetRegion::new(0, 0, 0, 0, 1200, 1200);
@@ -21,7 +24,11 @@ const SPRITE_BALLOON_GREEN: SheetRegion = SheetRegion::new(0, 116, 0, 0, 52, 73)
 const BALLOON_SIZE_NORMAL: Vec2 = Vec2 { x: 44.0, y: 44.0 };
 
 const SPRITE_DART: SheetRegion = SheetRegion::new(0, 415, 40, 0, 90, 110);
+const SPRITE_DART1: SheetRegion = SheetRegion::new(0, 415, 290, 0, 110, 90);
+const SPRITE_DART2: SheetRegion = SheetRegion::new(0, 415, 150, 0, 90, 110);
+const SPRITE_DART3: SheetRegion = SheetRegion::new(0, 415, 400, 0, 110, 90);
 const DART_SIZE: Vec2 = Vec2 { x: 20.0, y: 30.0 };
+const DART_SIZE2: Vec2 = Vec2 { x: 30.0, y: 20.0 };
 
 const MONKEY_COST: usize = 20;
 
@@ -65,7 +72,7 @@ impl engine::Game for Game {
             .into_rgba8();
         let spritesheet2 = engine.add_spritesheet(sprite_img2, Some("character spritesheet"));
 
-        let sprite_img3 = image::open("assets/monkey.png")
+        let sprite_img3 = image::open("assets/monkey3.png")
             .unwrap()
             .into_rgba8();
         let spritesheet3 = engine.add_spritesheet(sprite_img3, Some("character spritesheet"));
@@ -96,8 +103,8 @@ impl engine::Game for Game {
             points: 20,
             font,
             monkeys: Vec::with_capacity(16),
-            balloons: Vec::with_capacity(100),
-            darts: Vec::with_capacity(16),
+            balloons: Vec::with_capacity(128),
+            darts: Vec::with_capacity(256),
             circles: Vec::with_capacity(16),
             mouse_clicked: false,
             balloon_count: 0,
@@ -133,42 +140,57 @@ impl engine::Game for Game {
 
             self.circles.push(Circle {
                 pos: Vec2 {x: 450.0, y: 400.0},
-                filled: false
+                filled: false,
+                monkey: 10,
             });
             self.circles.push(Circle {
                 pos: Vec2 {x: 1050.0, y: 150.0},
-                filled: false
+                filled: false,
+                monkey: 10,
             });
             self.circles.push(Circle {
                 pos: Vec2 {x: 1050.0, y: 450.0},
-                filled: false
+                filled: false,
+                monkey: 10,
             });
             self.circles.push(Circle {
                 pos: Vec2 {x: 275.0, y: 550.0},
-                filled: false
+                filled: false,
+                monkey: 10,
             });
             self.circles.push(Circle {
                 pos: Vec2 {x: 1050.0, y: 300.0},
-                filled: false
+                filled: false,
+                monkey: 10,
             });
             self.circles.push(Circle {
                 pos: Vec2 {x: 170.0, y: 240.0},
-                filled: false
+                filled: false,
+                monkey: 10,
             });
         }
 
+        let mut dart_delete: Vec<usize> = Vec::with_capacity(16);
         let the_collisions = Collisiontwo::new(&self.balloons, &self.darts, &self.monkeys, &self.circles);
         let vec_coll_dart = the_collisions.check_collision_dart();
         if !vec_coll_dart.is_empty() {
             for (p, z) in vec_coll_dart.iter() {
-                self.darts.remove(*p);
-                self.dart_count -= 1;
+                //self.darts.remove(*p);
+                //self.dart_count -= 1;
+                dart_delete.push(*p);
                 self.balloons[*z].health -= 1;
                 self.points +=1;
                 if self.balloons[*z].health == 0 {
                     self.balloons.remove(*z);
                     self.balloon_count -= 1;
                 }
+            }
+        }
+        dart_delete.sort();
+        for i in dart_delete.iter() {
+            if self.darts.len() > *i {
+            self.darts.remove(*i);
+            self.dart_count -= 1;
             }
         }
 
@@ -186,19 +208,51 @@ impl engine::Game for Game {
             //println!("{:?}", time);
 
             if monkey.action_time.elapsed() > Duration::from_millis(700) {
-                self.darts.push(Dart {
-                    pos: monkey.pos,
-                    vel: Vec2 { x: 0.0, y: -4.0 },
-                });
-                monkey.action_time = Instant::now();
-                self.dart_count += 1;
+                if monkey.dir == 0 {
+                    self.darts.push(Dart {
+                        pos: monkey.pos,
+                        vel: Vec2 { x: 0.0, y: -4.0 },
+                        dir: monkey.dir,
+                    });
+                    monkey.action_time = Instant::now();
+                    self.dart_count += 1;
+                } else if monkey.dir == 1 {
+                    self.darts.push(Dart {
+                        pos: monkey.pos,
+                        vel: Vec2 { x: 4.0, y: 0.0 },
+                        dir: monkey.dir,
+                    });
+                    monkey.action_time = Instant::now();
+                    self.dart_count += 1;
+                } else if monkey.dir == 2 {
+                    self.darts.push(Dart {
+                        pos: monkey.pos,
+                        vel: Vec2 { x: 0.0, y: 4.0 },
+                        dir: monkey.dir,
+                    });
+                    monkey.action_time = Instant::now();
+                    self.dart_count += 1;
+                } else if monkey.dir == 3 {
+                    self.darts.push(Dart {
+                        pos: monkey.pos,
+                        vel: Vec2 { x: -4.0, y: 0.0 },
+                        dir: monkey.dir,
+                    });
+                    monkey.action_time = Instant::now();
+                    self.dart_count += 1;
+                }
+                
             }
         } 
 
         let mut dart_delete: Vec<usize> = Vec::with_capacity(16);
         for (dart_index, dart) in self.darts.iter_mut().enumerate() {
             dart.pos.y += dart.vel.y;
-            if dart.pos.y < 0.0 {
+            if dart.pos.y < 0.0 || dart.pos.y > 4000.0 {
+                dart_delete.push(dart_index);
+            }
+            dart.pos.x += dart.vel.x;
+            if dart.pos.x < 0.0 || dart.pos.x > 4000.0 {
                 dart_delete.push(dart_index);
             }
         }
@@ -217,7 +271,7 @@ impl engine::Game for Game {
                 
                     let the_collisions = Collisiontwo::new(&self.balloons, &self.darts, &self.monkeys, &self.circles);
                     let circle_interact = the_collisions.circle_monkey(mouse_x, mouse_y);
-                    println!("{}", circle_interact);
+                    //println!("{}", circle_interact);
                     if circle_interact != 10 && !self.circles[circle_interact].filled && self.points >= 20 {
                     self.monkeys.push(Monkey {
                         pos: Vec2 {
@@ -225,9 +279,12 @@ impl engine::Game for Game {
                             y: self.circles[circle_interact].pos.y,
                         },
                         action_time: Instant::now(),
+                        dir: 10,
+                        circle: circle_interact,
                     });
                     self.monkey_count += 1;
                     self.circles[circle_interact].filled = true;
+                    self.circles[circle_interact].monkey = self.monkey_count - 1;
                     self.points = self.points - 20;
                 }
                 } 
@@ -236,14 +293,22 @@ impl engine::Game for Game {
                 let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
     
                 self.mouse_clicked = true;
-                /*self.monkeys.push(Monkey {
-                    pos: Vec2 {
-                        x: mouse_x,
-                        y: mouse_y,
-                    },
-                    action_time: Instant::now(),
-                });
-                self.monkey_count += 1;*/
+            }
+
+            if engine.input.is_mouse_released(winit::event::MouseButton::Left) {
+                //println!("HI");
+                let mouse_pos = engine.input.mouse_pos();
+                let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
+                let the_collisions = Collisiontwo::new(&self.balloons, &self.darts, &self.monkeys, &self.circles);
+                let circle_interact = the_collisions.circle_monkey(mouse_x, mouse_y);
+                //println!("{}", circle_interact);
+                if circle_interact != 10 && self.circles[circle_interact].filled {
+                    self.monkeys[self.circles[circle_interact].monkey].dir += 1;
+                    if self.monkeys[self.circles[circle_interact].monkey].dir > 3 {
+                        self.monkeys[self.circles[circle_interact].monkey].dir = 0;
+                    }
+                    println!("{}", self.monkeys[self.circles[circle_interact].monkey].dir);
+                }
             }
 
         
@@ -277,14 +342,44 @@ impl engine::Game for Game {
         }
 
         for monkey in self.monkeys.iter() {
-            engine.draw_sprite(
-                self.spritesheet3,
-                AABB {
-                    center: monkey.pos,
-                    size: MONKEY_SIZE_PEASHOOTER,
-                },
-                SPRITE_MONKEY_PEASHOOTER,
-            );
+            if monkey.dir == 0 {
+                engine.draw_sprite(
+                    self.spritesheet3,
+                    AABB {
+                        center: monkey.pos,
+                        size: MONKEY_SIZE_PEASHOOTER,
+                    },
+                    SPRITE_MONKEY_PEASHOOTER1,
+                );
+            } else if monkey.dir == 1 {
+                engine.draw_sprite(
+                    self.spritesheet3,
+                    AABB {
+                        center: monkey.pos,
+                        size: MONKEY_SIZE_PEASHOOTER,
+                    },
+                    SPRITE_MONKEY_PEASHOOTER2,
+                );
+            } if monkey.dir == 2 {
+                engine.draw_sprite(
+                    self.spritesheet3,
+                    AABB {
+                        center: monkey.pos,
+                        size: MONKEY_SIZE_PEASHOOTER,
+                    },
+                    SPRITE_MONKEY_PEASHOOTER3,
+                );
+            } if monkey.dir == 3 {
+                engine.draw_sprite(
+                    self.spritesheet3,
+                    AABB {
+                        center: monkey.pos,
+                        size: MONKEY_SIZE_PEASHOOTER,
+                    },
+                    SPRITE_MONKEY_PEASHOOTER4,
+                );
+            }
+            
         }
 
         for balloon in self.balloons.iter() {
@@ -331,14 +426,43 @@ impl engine::Game for Game {
         );
 
         for dart in self.darts.iter() {
-            engine.draw_sprite(
+            if dart.dir == 0 {
+                engine.draw_sprite(
                 self.spritesheet3,
                 AABB {
                     center: dart.pos,
                     size: DART_SIZE,
                 },
                 SPRITE_DART,
-            );
+                );
+            } else if dart.dir == 1 {
+                engine.draw_sprite(
+                self.spritesheet3,
+                AABB {
+                    center: dart.pos,
+                    size: DART_SIZE2,
+                },
+                SPRITE_DART3,
+                );
+            } else if dart.dir == 2 {
+                engine.draw_sprite(
+                self.spritesheet3,
+                AABB {
+                    center: dart.pos,
+                    size: DART_SIZE,
+                },
+                SPRITE_DART2,
+                );
+            } else if dart.dir == 3 {
+                engine.draw_sprite(
+                self.spritesheet3,
+                AABB {
+                    center: dart.pos,
+                    size: DART_SIZE2,
+                },
+                SPRITE_DART1,
+                );
+            }
         }
     }
 }
