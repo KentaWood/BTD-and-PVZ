@@ -23,17 +23,9 @@ const BALLOON_SIZE_NORMAL: Vec2 = Vec2 { x: 44.0, y: 44.0 };
 const SPRITE_DART: SheetRegion = SheetRegion::new(0, 415, 40, 0, 90, 110);
 const DART_SIZE: Vec2 = Vec2 { x: 20.0, y: 30.0 };
 
-fn empty_space(monkeys: &Vec<Monkey>, x: f32, y: f32) -> bool {
-    for monkey in monkeys {
-        if monkey.pos.x == x && monkey.pos.y == y {
-            return false; // Found a match, return true
-        }
-    }
-    true // No match found, return false
-}
+const MONKEY_COST: usize = 20;
 
 struct Game {
-    score: u32,
     font: engine::BitFont,
     spritesheet: engine::Spritesheet,
     spritesheet2: engine::Spritesheet,
@@ -48,7 +40,6 @@ struct Game {
     monkey_count: usize,
     balloon_count: usize,
     dart_count: usize,
-    mode: u32, 
     monkey_index: usize,
     mouse_clicked: bool,
     once: bool,
@@ -96,18 +87,14 @@ impl engine::Game for Game {
             10,
         );
 
-        let points = 0;
-
         Game {
             spritesheet,
             spritesheet2,
             spritesheet3,
             spritesheet4,
             spritesheet5,
-            points,
-            score: 0,
+            points: 20,
             font,
-            mode: 0,
             monkeys: Vec::with_capacity(16),
             balloons: Vec::with_capacity(100),
             darts: Vec::with_capacity(16),
@@ -170,7 +157,7 @@ impl engine::Game for Game {
             });
         }
 
-        let the_collisions = Collisiontwo::new(&self.balloons, &self.darts, &self.monkeys);
+        let the_collisions = Collisiontwo::new(&self.balloons, &self.darts, &self.monkeys, &self.circles);
         let vec_coll_dart = the_collisions.check_collision_dart();
         if !vec_coll_dart.is_empty() {
             for (p, z) in vec_coll_dart.iter() {
@@ -220,50 +207,46 @@ impl engine::Game for Game {
             self.dart_count -= 1;
         }
 
-        if self.oneplacement{
             if self.mouse_clicked {
                 if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
                     let mouse_pos = engine.input.mouse_pos();
                     let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
     
                     // println!("{:?}", mouse_pos);
-                    println!("{}, {}", mouse_x, mouse_y);
-                    self.monkeys[self.monkey_index].pos.x = mouse_x;
-                    self.monkeys[self.monkey_index].pos.y = mouse_y;
-                } else {
-                    let mouse_pos = engine.input.mouse_pos();
-                    let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
-                    let (grid_x, grid_y) = screen_to_grid(mouse_x, mouse_y);
-    
-                    if empty_space(&self.monkeys, grid_x, grid_y) {
-                        self.monkeys[self.monkey_index].pos.x = mouse_x;
-                        self.monkeys[self.monkey_index].pos.y = mouse_y;
-    
-                        self.mouse_clicked = false;
-    
-                        self.monkey_index += 1;
-                        self.oneplacement = false;
-                    } else {
-                        self.mouse_clicked = false;
-                        self.monkeys.pop();
-                    }
+                   // println!("{}, {}", mouse_x, mouse_y);
+                
+                    let the_collisions = Collisiontwo::new(&self.balloons, &self.darts, &self.monkeys, &self.circles);
+                    let circle_interact = the_collisions.circle_monkey(mouse_x, mouse_y);
+                    println!("{}", circle_interact);
+                    if circle_interact != 10 && !self.circles[circle_interact].filled && self.points >= 20 {
+                    self.monkeys.push(Monkey {
+                        pos: Vec2 {
+                            x: self.circles[circle_interact].pos.x,
+                            y: self.circles[circle_interact].pos.y,
+                        },
+                        action_time: Instant::now(),
+                    });
+                    self.monkey_count += 1;
+                    self.circles[circle_interact].filled = true;
+                    self.points = self.points - 20;
                 }
+                } 
             } else if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
                 let mouse_pos = engine.input.mouse_pos();
                 let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
     
                 self.mouse_clicked = true;
-                self.monkeys.push(Monkey {
+                /*self.monkeys.push(Monkey {
                     pos: Vec2 {
                         x: mouse_x,
                         y: mouse_y,
                     },
                     action_time: Instant::now(),
                 });
-                self.monkey_count += 1;
+                self.monkey_count += 1;*/
             }
 
-        }
+        
         //Handles the placement of plants
        
     }

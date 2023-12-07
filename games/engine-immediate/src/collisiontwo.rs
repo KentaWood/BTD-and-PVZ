@@ -1,20 +1,27 @@
 pub use glam::*;
 
-use crate::geom::{Dart, Monkey, Balloon};
+use crate::geom::{Balloon, Circle, Dart, Monkey};
 
 pub struct Collisiontwo {
     balloons: Vec<Balloon>,
     darts: Vec<Dart>,
     monkeys: Vec<Monkey>,
+    circles: Vec<Circle>,
 }
 
 // NOTE::: IDEALLY MOVE DEFAULT SIZES SO THEY AREN"T HARD CODED (LIKE 24.0, 128.0, etc)
 impl Collisiontwo {
-    pub fn new(balloons: &Vec<Balloon>, darts: &Vec<Dart>, monkeys: &Vec<Monkey>) -> Self {
+    pub fn new(
+        balloons: &Vec<Balloon>,
+        darts: &Vec<Dart>,
+        monkeys: &Vec<Monkey>,
+        circles: &Vec<Circle>,
+    ) -> Self {
         Collisiontwo {
             balloons: balloons.to_vec(),
             darts: darts.to_vec(),
             monkeys: monkeys.to_vec(),
+            circles: circles.to_vec(),
         }
     }
 
@@ -36,5 +43,20 @@ impl Collisiontwo {
             monk = 0;
         }
         return collisions;
+    }
+
+    pub fn circle_monkey(&self, x: f32, y: f32) -> usize {
+        for (circle_index, circle) in self.circles.iter().enumerate() {
+            if !circle.filled {
+                if x > circle.pos.x - 80.0
+                    && x < circle.pos.x + 80.0
+                    && y > circle.pos.y - 50.0
+                    && y < circle.pos.y + 50.0
+                {
+                    return circle_index;
+                }
+            }
+        }
+        return 10;
     }
 }

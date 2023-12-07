@@ -1,5 +1,3 @@
-
-
 use std::time::{Duration, Instant};
 
 pub fn screen_to_grid(x: f32, y: f32) -> (f32, f32) {
@@ -76,6 +74,6 @@ pub fn select_tempo(elapsed_time: Duration) -> u64 {
     if index > 4 {
         index = 4;
     }
-    
+
     index
 }
