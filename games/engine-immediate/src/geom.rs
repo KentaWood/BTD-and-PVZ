@@ -28,14 +28,18 @@ pub struct Zombie {
 #[derive(Clone, Copy)]
 pub struct Monkey {
     pub pos: Vec2,
-    pub dart: bool,
+    pub action_time: Instant,
+}
+
+pub struct Circle {
+    pub pos: Vec2,
+    pub filled: bool,
 }
 
 #[derive(Clone, Copy)]
 pub struct Dart {
     pub pos: Vec2,
     pub vel: Vec2,
-    pub monkey_num: usize,
 }
 
 #[derive(Clone, Copy)]
