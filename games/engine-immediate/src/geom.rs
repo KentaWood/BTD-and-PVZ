@@ -1,10 +1,6 @@
 use frenderer::{Camera2D, Transform};
 pub use glam::*;
-use std::{
-    borrow::Cow,
-    mem,
-    time::{Duration, Instant},
-};
+use std::time::Instant;
 
 #[derive(Clone, Copy)]
 pub struct Plant {

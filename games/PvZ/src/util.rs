@@ -1,4 +1,4 @@
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 pub fn screen_to_grid(x: f32, y: f32) -> (f32, f32) {
     let mut grid_x = 700.0; // Default values

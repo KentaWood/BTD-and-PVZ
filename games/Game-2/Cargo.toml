@@ -1,5 +1,5 @@
 [package]
-name = "BTD"
+name = "btd"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,6 +10,7 @@ engine-immediate = {path="../engine-immediate"}
 winit = "0.28"
 rand = "0.8"
 image = {version="0.24.7", features=["png"]}
+kira = "0.8.5"
 
 [features]
 default = []

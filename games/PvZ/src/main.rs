@@ -1,12 +1,15 @@
 use engine_immediate as engine;
 use engine_immediate::{collision::*, geom::*, Camera, Engine, SheetRegion};
-
-use rand::Rng;
-use std::{
-    borrow::Cow,
-    mem,
-    time::{Duration, Instant},
+use kira::{
+    manager::{
+        backend::DefaultBackend, // changed to default backend
+        AudioManager,
+        AudioManagerSettings,
+    },
+    sound::static_sound::{StaticSoundData, StaticSoundSettings},
 };
+use rand::Rng;
+use std::time::{Duration, Instant};
 
 mod util;
 use util::convert_mouse_pos;
@@ -250,31 +253,29 @@ impl engine::Game for Game {
                 self.plants[self.plant_index].pos.x = mouse_x;
                 self.plants[self.plant_index].pos.y = mouse_y;
                 println!("{},{}", mouse_x, mouse_y);
-            } else {
-                if self.sunflower >= 100 {
-                    let mouse_pos = engine.input.mouse_pos();
-                    let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
-                    let (grid_x, grid_y) = screen_to_grid(mouse_x, mouse_y);
+            } else if self.sunflower >= 100 {
+                let mouse_pos = engine.input.mouse_pos();
+                let (mouse_x, mouse_y) = convert_mouse_pos(mouse_pos.into());
+                let (grid_x, grid_y) = screen_to_grid(mouse_x, mouse_y);
 
-                    if empty_space(&self.plants, grid_x, grid_y) {
-                        self.plants[self.plant_index].pos.x = grid_x;
-                        self.plants[self.plant_index].pos.y = grid_y;
+                if empty_space(&self.plants, grid_x, grid_y) {
+                    self.plants[self.plant_index].pos.x = grid_x;
+                    self.plants[self.plant_index].pos.y = grid_y;
 
-                        self.plants[self.plant_index].placed = true;
+                    self.plants[self.plant_index].placed = true;
 
-                        self.mouse_clicked = false;
+                    self.mouse_clicked = false;
 
-                        self.plant_index += 1;
-                        self.sunflower -= 100;
-                    } else {
-                        self.mouse_clicked = false;
-                        self.plant_index -= 1;
-                        self.plants.pop();
-                    }
+                    self.plant_index += 1;
+                    self.sunflower -= 100;
                 } else {
                     self.mouse_clicked = false;
+                    self.plant_index -= 1;
                     self.plants.pop();
                 }
+            } else {
+                self.mouse_clicked = false;
+                self.plants.pop();
             }
         } else if engine.input.is_mouse_down(winit::event::MouseButton::Left) {
             let mouse_pos = engine.input.mouse_pos();
@@ -296,8 +297,6 @@ impl engine::Game for Game {
 
     fn render(&mut self, engine: &mut Engine) {
         //start (Maybe)
-
-        if self.mode == 0 {}
 
         //PvZ game rendering
         if self.mode == 1 || self.mode == 2 {
@@ -377,5 +376,11 @@ impl engine::Game for Game {
     }
 }
 fn main() {
+    let mut manager = AudioManager::<DefaultBackend>::new(AudioManagerSettings::default()).unwrap();
+    let sound_data =
+        StaticSoundData::from_file("assets/pvz.mp3", StaticSoundSettings::default()).unwrap();
+
+    let _ = manager.play(sound_data.clone());
+
     Engine::new(winit::window::WindowBuilder::new()).run::<Game>();
 }
