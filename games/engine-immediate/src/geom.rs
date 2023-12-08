@@ -1,6 +1,6 @@
 use frenderer::{Camera2D, Transform};
-use std::{ borrow::Cow, mem, time::{Duration, Instant}, };
 pub use glam::*;
+use std::time::Instant;
 
 #[derive(Clone, Copy)]
 pub struct Plant {
@@ -8,7 +8,6 @@ pub struct Plant {
 
     pub action_time: Instant,
     pub placed: bool,
-
 }
 
 #[derive(Clone, Copy)]
@@ -24,18 +23,26 @@ pub struct Zombie {
     pub health: usize,
 }
 
-
 #[derive(Clone, Copy)]
 pub struct Monkey {
     pub pos: Vec2,
-    pub dart: bool,
+    pub action_time: Instant,
+    pub dir: usize,
+    pub circle: usize,
+}
+
+#[derive(Clone, Copy)]
+pub struct Circle {
+    pub pos: Vec2,
+    pub filled: bool,
+    pub monkey: usize,
 }
 
 #[derive(Clone, Copy)]
 pub struct Dart {
     pub pos: Vec2,
     pub vel: Vec2,
-    pub monkey_num: usize,
+    pub dir: usize,
 }
 
 #[derive(Clone, Copy)]
@@ -89,14 +96,12 @@ impl Balloon {
             self.segment = 13;
         } else if self.segment == 13 && self.pos.y >= 610.0 {
             self.segment = 14;
-        } 
-    } 
+        }
+    }
 }
 
-    
-        // 770, 540
-        // 770, 610
-
+// 770, 540
+// 770, 610
 
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq, bytemuck::Zeroable, bytemuck::Pod, Debug)]

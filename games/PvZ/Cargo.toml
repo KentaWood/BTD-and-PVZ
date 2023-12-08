@@ -1,5 +1,5 @@
 [package]
-name = "PvZ"
+name = "pvz"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,6 +9,7 @@ edition = "2021"
 engine-immediate = {path="../engine-immediate"}
 winit = "0.28"
 rand = "0.8"
+kira = "0.8.5"
 image = {version="0.24.7", features=["png"]}
 
 [features]
